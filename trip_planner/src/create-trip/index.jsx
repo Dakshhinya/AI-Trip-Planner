@@ -8,6 +8,18 @@ import { Button } from '@/components/ui/button';
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
+  const [formData, setFormData] = useState({});
+
+  const handleInputChange = (name, value) => {
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
+  useEffect(() => {
+    console.log(formData);
+  }, [formData]);
 
   return (
     <>
@@ -25,7 +37,7 @@ const CreateTrip = () => {
               apiKey={importmeta.env.VITE_GOOGLE_PLACE_API_KEY}
               selectProps={{
                 place,
-                onChange: (v) => { setPlace(v) }
+                onChange: (v) => { setPlace(v); handleInputChange('location', v); }
               }}
             /> 
             */}
@@ -33,14 +45,24 @@ const CreateTrip = () => {
 
           <div>
             <h2 className='text-xl my-3 font-medium'>How many days do you prefer?</h2>
-            <Input placeholder={'Ex.3'} type="number" />
+            <Input
+              placeholder={'Ex.3'}
+              type="number"
+              onChange={(e) => handleInputChange('noOfDays', e.target.value)} 
+            />
           </div>
 
           <div>
             <h2 className='text-xl my-3 font-medium'>Budget💴</h2>
             <div className='grid grid-cols-3 gap-5 mt-5'>
               {SelectBudgetOptions.map((item, index) => (
-                <div key={index} className='p-4 border cursor-pointer rounded-lg hover:shadow'>
+                <div
+                  key={index}
+                  onClick={() => handleInputChange('budget', item.title)}
+                  className={`p-4 border cursor-pointer 
+                    rounded-lg hover:shadow-lg
+                    ${formData?.budget === item.title && 'shadow-lg border-black'}`}                    
+                >
                   <h2 className='text-4xl'>{item.icon}</h2>
                   <h2 className='font-bold text-lg'>{item.title}</h2>
                   <h2 className='text-sm text-gray-500'>{item.desc}</h2>
@@ -53,7 +75,13 @@ const CreateTrip = () => {
             <h2 className='text-xl my-3 font-medium'>Travelling with?🌴</h2>
             <div className='grid grid-cols-3 gap-5 mt-5'>
               {SelectTravelsList.map((item, index) => (
-                <div key={index} className='p-4 border cursor-pointer rounded-lg hover:shadow'>
+                <div
+                  key={index}
+                  onClick={() => handleInputChange('traveller', item.people)}
+                  className={`p-4 border cursor-pointer 
+                    rounded-lg hover:shadow-lg
+                    ${formData?.traveller==item.people&& 'shadow-lg border-black'}`}
+                >
                   <h2 className='text-4xl'>{item.icon}</h2>
                   <h2 className='font-bold text-lg'>{item.title}</h2>
                   <h2 className='text-sm text-gray-500'>{item.desc}</h2>
