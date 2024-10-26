@@ -3,7 +3,7 @@ import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import { Input } from '../components/ui/input';
 import { SelectBudgetOptions, SelectTravelsList } from '@/constants/options';
 import { Button } from '@/components/ui/button';
-
+import { toast } from 'sonner';
 const CreateTrip = () => {
   const [place, setPlace] = useState();
   const [formData, setFormData] = useState({
@@ -29,7 +29,8 @@ const CreateTrip = () => {
   }, [formData]);
 
   const onGenerateTrip = () => {
-    if (formData.noOfDays > 10 && !formData?.location || !formData?.budget  || !formData?.traveller){
+    if (formData.noOfDays > 10 && !formData?.location||!formData?.noOfDays || !formData?.budget  || !formData?.traveller){
+      toast("Please enter all details")
       return;
     } 
     console.log('Generated Trip:', formData);
@@ -44,13 +45,13 @@ const CreateTrip = () => {
       <div className='mt-20 flex flex-col gap-10'>
         <div>
           <h2 className='text-xl my-3 font-medium'>What is your choice of destination?</h2>
-          {/* <GooglePlacesAutocomplete
+          <GooglePlacesAutocomplete
             apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
             selectProps={{
               place,
               onChange: (v) => { setPlace(v); handleInputChange('location', v); }
             }}
-          /> */}
+          />
         </div>
 
         <div>
@@ -60,7 +61,7 @@ const CreateTrip = () => {
             name="noOfDays"
             placeholder="Ex.3"
             type="number"
-            value={formData.noOfDays} // Controlled value
+            value={formData.noOfDays}
             onChange={(e) => handleInputChange('noOfDays', e.target.value)}
           />
         </div>
