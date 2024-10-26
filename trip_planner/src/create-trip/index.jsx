@@ -21,7 +21,6 @@ const CreateTrip = () => {
   };
 
   useEffect(() => {
-    // Skip initial render to avoid duplicate console logs
     if (isInitialRender) {
       setIsInitialRender(false);
       return;
@@ -30,10 +29,11 @@ const CreateTrip = () => {
   }, [formData]);
 
   const onGenerateTrip = () => {
-    if (formData.noOfDays > 10) return;
+    if (formData.noOfDays > 10 && !formData?.location || !formData?.budget  || !formData?.traveller){
+      return;
+    } 
     console.log('Generated Trip:', formData);
   };
-
   return (
     <div className='sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10'>
       <h2 className='font-bold text-3xl'>Share with us your travel preferences</h2>
@@ -42,12 +42,10 @@ const CreateTrip = () => {
       </p>
 
       <div className='mt-20 flex flex-col gap-10'>
-        {/* Destination Input */}
         <div>
           <h2 className='text-xl my-3 font-medium'>What is your choice of destination?</h2>
-          {/* Uncomment if GooglePlacesAutocomplete is configured */}
           {/* <GooglePlacesAutocomplete
-            apiKey={importmeta.env.VITE_GOOGLE_PLACE_API_KEY}
+            apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
             selectProps={{
               place,
               onChange: (v) => { setPlace(v); handleInputChange('location', v); }
@@ -55,7 +53,6 @@ const CreateTrip = () => {
           /> */}
         </div>
 
-        {/* Number of Days Input */}
         <div>
           <h2 className='text-xl my-3 font-medium'>How many days do you prefer?</h2>
           <Input
@@ -68,7 +65,6 @@ const CreateTrip = () => {
           />
         </div>
 
-        {/* Budget Options */}
         <div>
           <h2 className='text-xl my-3 font-medium'>Budget💴</h2>
           <div className='grid grid-cols-3 gap-5 mt-5'>
@@ -86,8 +82,6 @@ const CreateTrip = () => {
             ))}
           </div>
         </div>
-
-        {/* Traveller Options */}
         <div>
           <h2 className='text-xl my-3 font-medium'>Travelling with?🌴</h2>
           <div className='grid grid-cols-3 gap-5 mt-5'>
@@ -106,8 +100,6 @@ const CreateTrip = () => {
           </div>
         </div>
       </div>
-
-      {/* Align the button to the right */}
       <div className='flex justify-end my-10'>
         <Button onClick={onGenerateTrip}>Generate Trip</Button>
       </div>
