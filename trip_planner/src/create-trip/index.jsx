@@ -42,7 +42,7 @@ const CreateTrip = () => {
         Just provide some basic information, and our trip planner will generate a customized itinerary based on your preferences.
       </p>
 
-      <div className='mt-20 flex flex-col gap-10'>
+      <div className='mt-18 flex flex-col gap-10'>
         <div>
           <h2 className='text-xl my-3 font-medium'>What is your choice of destination?</h2>
           <GooglePlacesAutocomplete
