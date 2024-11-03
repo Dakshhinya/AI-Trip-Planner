@@ -4,15 +4,30 @@ import { Input } from '../components/ui/input';
 import { SelectBudgetOptions, SelectTravelsList } from '@/constants/options';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { AI_PROMPT } from '@/constants/options';
+import { chatSession } from '@/service/AIModal';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+
 const CreateTrip = () => {
   const [place, setPlace] = useState();
-  const [formData, setFormData] = useState({
+
+  const [formData, setFormData] = useState(
+    {
     noOfDays: '',
     budget: '',
     traveller: ''
-  });
+  }
+  );
   const [isInitialRender, setIsInitialRender] = useState(true);
-
+  
+  const [openDialog,setOpenDialog]=useState(false);
   const handleInputChange = (name, value) => {
     setFormData(prevData => ({
       ...prevData,
@@ -28,12 +43,28 @@ const CreateTrip = () => {
     console.log(formData);
   }, [formData]);
 
-  const onGenerateTrip = () => {
+  const onGenerateTrip = async() => {
+    const user=localStorage.getItem('user');
+    if(!user){
+      setOpenDialog(true)
+      return ;
+    }
     if (formData.noOfDays > 10 && !formData?.location||!formData?.noOfDays || !formData?.budget  || !formData?.traveller){
       toast("Please enter all details")
       return;
     } 
-    console.log('Generated Trip:', formData);
+    // console.log('Generated Trip:', formData);
+    const FINAL_PROMPT=AI_PROMPT
+    .replace('{location}',formData?.location.label)
+    .replace('{totalDays}',formData?.noOfDays)
+    .replace('{traveller}',formData?.traveller)
+    .replace('{budget}',formData?.budget)
+    .replace('{totalDays}',formData?.noOfDays)
+
+    console.log(FINAL_PROMPT);
+
+    const result=await chatSession.sendMessage(FINAL_PROMPT)
+    console.log(result?.response?.text())
   };
   return (
     <div className='sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10'>
@@ -104,6 +135,7 @@ const CreateTrip = () => {
       <div className='flex justify-end my-10'>
         <Button onClick={onGenerateTrip}>Generate Trip</Button>
       </div>
+
     </div>
   );
 };
