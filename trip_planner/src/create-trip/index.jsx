@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import { Input } from '../components/ui/input';
@@ -17,15 +18,18 @@ import {
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
+  
 
   const [formData, setFormData] = useState(
     {
     noOfDays: '',
     budget: '',
     traveller: ''
+  })
   }
-  );
+  
   const [isInitialRender, setIsInitialRender] = useState(true);
+
   
   const [openDialog,setOpenDialog]=useState(false);
   const handleInputChange = (name, value) => {
@@ -43,6 +47,7 @@ const CreateTrip = () => {
     console.log(formData);
   }, [formData]);
 
+  const onGenerateTrip = () => {
   const onGenerateTrip = async() => {
     const user=localStorage.getItem('user');
     if(!user){
@@ -53,6 +58,7 @@ const CreateTrip = () => {
       toast("Please enter all details")
       return;
     } 
+    console.log('Generated Trip:', formData);
     // console.log('Generated Trip:', formData);
     const FINAL_PROMPT=AI_PROMPT
     .replace('{location}',formData?.location.label)
@@ -139,5 +145,3 @@ const CreateTrip = () => {
     </div>
   );
 };
-
-export default CreateTrip;
