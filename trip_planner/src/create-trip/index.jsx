@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
 import { Input } from '../components/ui/input';
@@ -14,24 +13,21 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
+} from "@/components/ui/dialog";
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
-  
 
-  const [formData, setFormData] = useState(
-    {
+  const [formData, setFormData] = useState({
+    location: '',
     noOfDays: '',
     budget: '',
-    traveller: ''
-  })
-  }
-  
-  const [isInitialRender, setIsInitialRender] = useState(true);
+    traveller: '',
+  });
 
-  
-  const [openDialog,setOpenDialog]=useState(false);
+  const [isInitialRender, setIsInitialRender] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
+
   const handleInputChange = (name, value) => {
     setFormData(prevData => ({
       ...prevData,
@@ -47,31 +43,30 @@ const CreateTrip = () => {
     console.log(formData);
   }, [formData]);
 
-  const onGenerateTrip = () => {
-  const onGenerateTrip = async() => {
-    const user=localStorage.getItem('user');
-    if(!user){
-      setOpenDialog(true)
-      return ;
-    }
-    if (formData.noOfDays > 10 && !formData?.location||!formData?.noOfDays || !formData?.budget  || !formData?.traveller){
-      toast("Please enter all details")
+  const onGenerateTrip = async () => {
+    const user = localStorage.getItem('user');
+    if (!user) {
+      setOpenDialog(true);
       return;
-    } 
+    }
+    if (!formData.location || !formData.noOfDays || !formData.budget || !formData.traveller) {
+      toast("Please enter all details");
+      return;
+    }
+
     console.log('Generated Trip:', formData);
-    // console.log('Generated Trip:', formData);
-    const FINAL_PROMPT=AI_PROMPT
-    .replace('{location}',formData?.location.label)
-    .replace('{totalDays}',formData?.noOfDays)
-    .replace('{traveller}',formData?.traveller)
-    .replace('{budget}',formData?.budget)
-    .replace('{totalDays}',formData?.noOfDays)
+    const FINAL_PROMPT = AI_PROMPT
+      .replace('{location}', formData?.location.label)
+      .replace('{totalDays}', formData?.noOfDays)
+      .replace('{traveller}', formData?.traveller)
+      .replace('{budget}', formData?.budget);
 
     console.log(FINAL_PROMPT);
 
-    const result=await chatSession.sendMessage(FINAL_PROMPT)
-    console.log(result?.response?.text())
+    const result = await chatSession.sendMessage(FINAL_PROMPT);
+    console.log(result?.response?.text());
   };
+
   return (
     <div className='sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10'>
       <h2 className='font-bold text-3xl'>Share with us your travel preferences</h2>
@@ -100,6 +95,7 @@ const CreateTrip = () => {
             type="number"
             value={formData.noOfDays}
             onChange={(e) => handleInputChange('noOfDays', e.target.value)}
+            onWheel={(e) => e.target.blur()}
           />
         </div>
 
@@ -120,6 +116,7 @@ const CreateTrip = () => {
             ))}
           </div>
         </div>
+        
         <div>
           <h2 className='text-xl my-3 font-medium'>Travelling with?🌴</h2>
           <div className='grid grid-cols-3 gap-5 mt-5'>
@@ -138,10 +135,21 @@ const CreateTrip = () => {
           </div>
         </div>
       </div>
+      
       <div className='flex justify-end my-10'>
         <Button onClick={onGenerateTrip}>Generate Trip</Button>
       </div>
 
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>User Not Logged In</DialogTitle>
+            <DialogDescription>Please log in to generate a trip plan.</DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
+
+export default CreateTrip;
