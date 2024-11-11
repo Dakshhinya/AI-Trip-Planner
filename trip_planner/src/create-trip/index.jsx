@@ -17,7 +17,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { CgSearchLoading } from "react-icons/cg";
 import { setDoc,doc } from 'firebase/firestore';
-// import { db } from '';
+import { db } from '@/service/firebaseConfig';
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
