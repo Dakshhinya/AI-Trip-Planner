@@ -17,8 +17,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { CgSearchLoading } from "react-icons/cg";
 import { setDoc,doc } from 'firebase/firestore';
-// import { db } from '';
-
+import { db } from '@/service/firebaseConfig';
 const CreateTrip = () => {
   const [place, setPlace] = useState();
 
@@ -57,7 +56,7 @@ const CreateTrip = () => {
     }).then((resp) => {
       console.log(resp);
       localStorage.setItem('user',JSON.stringify(resp.data));
-      setOpenDialog(true);
+      setOpenDialog(false);
       OnGenerateTrip();
       
     }).catch((error) => {
@@ -67,7 +66,10 @@ const CreateTrip = () => {
 
   const login = useGoogleLogin({
     onSuccess: (codeResp) => GetUserProfile(codeResp),
-    onError: (error) => console.log(error)
+    onError: (error) => {
+      console.log(error);
+      setOpenDialog(false);
+    }
   });
 
   const OnGenerateTrip = async () => {
