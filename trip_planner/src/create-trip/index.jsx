@@ -10,10 +10,14 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  DialogHeader
 } from "@/components/ui/dialog";
+import { BsGoogle } from "react-icons/bs";
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { CgSearchLoading } from "react-icons/cg";
+import { setDoc,doc } from 'firebase/firestore';
+// import { db } from '';
 
 const CreateTrip = () => {
   const [place, setPlace] = useState();
@@ -27,6 +31,7 @@ const CreateTrip = () => {
 
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
+  const [loading,setLoading]=useState(false);
 
   const handleInputChange = (name, value) => {
     setFormData(prevData => ({
@@ -43,29 +48,80 @@ const CreateTrip = () => {
     console.log(formData);
   }, [formData]);
 
-  const onGenerateTrip = async () => {
+  const GetUserProfile = (tokenInfo) => {
+    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
+      headers: {
+        Authorization: `Bearer ${tokenInfo?.access_token}`,
+        Accept: `Application/json`
+      }
+    }).then((resp) => {
+      console.log(resp);
+      localStorage.setItem('user',JSON.stringify(resp.data));
+      setOpenDialog(true);
+      OnGenerateTrip();
+      
+    }).catch((error) => {
+      console.error("Error fetching user profile:", error);
+    });
+  };
+
+  const login = useGoogleLogin({
+    onSuccess: (codeResp) => GetUserProfile(codeResp),
+    onError: (error) => console.log(error)
+  });
+
+  const OnGenerateTrip = async () => {
+
+
     const user = localStorage.getItem('user');
     if (!user) {
       setOpenDialog(true);
       return;
     }
-    if (!formData.location || !formData.noOfDays || !formData.budget || !formData.traveller) {
-      toast("Please enter all details");
+    if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
+      toast("Please fill all details!");
       return;
     }
 
     console.log('Generated Trip:', formData);
+    setLoading(true);
     const FINAL_PROMPT = AI_PROMPT
       .replace('{location}', formData?.location.label)
       .replace('{totalDays}', formData?.noOfDays)
       .replace('{traveller}', formData?.traveller)
       .replace('{budget}', formData?.budget);
 
-    console.log(FINAL_PROMPT);
 
-    const result = await chatSession.sendMessage(FINAL_PROMPT);
-    console.log(result?.response?.text());
+    try {
+      const result = await chatSession.sendMessage(FINAL_PROMPT);
+      const responseText = result?.response
+        ? await result.response.text()
+        : await result.text();
+  
+      console.log(responseText);
+      setLoading(false);
+      SaveAiTrip(responseText)
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
   };
+
+  const SaveAiTrip=async(TripData)=>{
+
+setLoading(true);
+const user=JSON.parse(localStorage.getItem('user'));
+const docId=Date.now().toString()
+await setDoc(doc(db, "AITrips", docId), {
+  userSelection:formData,
+  tripData:TripData,
+  userEmail:user?.email,
+  id:docId
+});
+setLoading(false);
+  }
+  useEffect(() => {
+    console.log("Dialog open state:", openDialog);
+  }, [openDialog]);
 
   return (
     <div className='sm:px-10 md:px-32 lg:px-56 xl:px-10 px-5 mt-10'>
@@ -107,7 +163,7 @@ const CreateTrip = () => {
                 key={index}
                 onClick={() => handleInputChange('budget', item.title)}
                 className={`p-4 border cursor-pointer rounded-lg hover:shadow-lg
-                  ${formData.budget === item.title && 'shadow-lg border-black'}`}                    
+                  ${formData.budget === item.title && 'shadow-lg border-black'}`}
               >
                 <h2 className='text-4xl'>{item.icon}</h2>
                 <h2 className='font-bold text-lg'>{item.title}</h2>
@@ -137,14 +193,36 @@ const CreateTrip = () => {
       </div>
       
       <div className='flex justify-end my-10'>
-        <Button onClick={onGenerateTrip}>Generate Trip</Button>
+        <Button 
+        disabled={loading}
+        onClick={() => setOpenDialog(true)}>
+          {loading?
+        <CgSearchLoading className='h-7 w-7 animate-spin' />:'Generate Trip'
+
+          }
+          </Button>
       </div>
 
       <Dialog open={openDialog} onOpenChange={setOpenDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>User Not Logged In</DialogTitle>
-            <DialogDescription>Please log in to generate a trip plan.</DialogDescription>
+            <DialogDescription>
+              <div className="flex items-center space-x-3"> 
+                <img src="/logo.svg" alt="Logo" />
+                <h2 className="text-xl font-semibold">RoamRight</h2>
+              </div>
+              
+              <h2 className="font-bold text-lg mt-7 mb-3">Sign In with Google</h2>
+              <p className="mb-4">Sign in to the app securely with Google authentication</p>
+              <Button 
+                onClick={login}
+                className="w-full mt-5 flex gap-4 items-center">
+                  
+                <BsGoogle className="h-7 w-7" />
+                Sign In with Google
+             
+              </Button>
+            </DialogDescription>
           </DialogHeader>
         </DialogContent>
       </Dialog>
