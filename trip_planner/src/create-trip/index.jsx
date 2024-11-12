@@ -15,10 +15,10 @@ import {
 import { BsGoogle } from "react-icons/bs";
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
-import { CgSearchLoading } from "react-icons/cg";
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
 import { setDoc,doc } from 'firebase/firestore';
 import { db } from '@/service/firebaseConfig';
-
+import { useNavigate } from 'react-router-dom';
 const CreateTrip = () => {
   const [place, setPlace] = useState();
 
@@ -32,7 +32,7 @@ const CreateTrip = () => {
   const [isInitialRender, setIsInitialRender] = useState(true);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading,setLoading]=useState(false);
-
+  const navigate=useNavigate();
   const handleInputChange = (name, value) => {
     setFormData(prevData => ({
       ...prevData,
@@ -57,7 +57,7 @@ const CreateTrip = () => {
     }).then((resp) => {
       console.log(resp);
       localStorage.setItem('user',JSON.stringify(resp.data));
-      setOpenDialog(true);
+      setOpenDialog(false);
       OnGenerateTrip();
       
     }).catch((error) => {
@@ -67,7 +67,10 @@ const CreateTrip = () => {
 
   const login = useGoogleLogin({
     onSuccess: (codeResp) => GetUserProfile(codeResp),
-    onError: (error) => console.log(error)
+    onError: (error) => {
+      console.log(error);
+      setOpenDialog(false);
+    }
   });
 
   const OnGenerateTrip = async () => {
@@ -111,13 +114,15 @@ const CreateTrip = () => {
 setLoading(true);
 const user=JSON.parse(localStorage.getItem('user'));
 const docId=Date.now().toString()
+
 await setDoc(doc(db, "AITrips", docId), {
   userSelection:formData,
-  tripData:TripData,
+  tripData:JSON.parsw(TripData),
   userEmail:user?.email,
   id:docId
 });
 setLoading(false);
+navigate('/view-trip/'+docId)
   }
   useEffect(() => {
     console.log("Dialog open state:", openDialog);
@@ -197,7 +202,7 @@ setLoading(false);
         disabled={loading}
         onClick={() => setOpenDialog(true)}>
           {loading?
-        <CgSearchLoading className='h-7 w-7 animate-spin' />:'Generate Trip'
+        <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' />:'Generate Trip'
 
           }
           </Button>
