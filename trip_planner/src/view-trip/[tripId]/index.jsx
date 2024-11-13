@@ -5,6 +5,7 @@ import { doc,getDoc } from 'firebase/firestore';
 import { db } from '@/service/firebaseConfig';
 import InfoSection from '../components/InfoSection';
 import Hotels from '../components/Hotels';
+import PlacesToVisit from '../components/PlacesToVisit';
 function Viewtrip() {
   const {tripId}=useParams()
   const[trip,setTrip]=useState([])
@@ -37,6 +38,7 @@ useEffect(()=>{
       <p>Loading...</p>
     )}
       {/* dailyPlan  */}
+      <PlacesToVisit trip={trip}/>
     </div>
   )
 }
