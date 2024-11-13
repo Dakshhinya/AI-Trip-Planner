@@ -39,6 +39,8 @@ useEffect(()=>{
     )}
       {/* dailyPlan  */}
       <PlacesToVisit trip={trip}/>
+      {/* Footer  */}
+      {/* <Footer trip={trip}/> */}
     </div>
   )
 }
