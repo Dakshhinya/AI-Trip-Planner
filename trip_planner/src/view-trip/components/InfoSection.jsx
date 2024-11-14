@@ -1,25 +1,49 @@
   
-  import { Button } from '@/components/ui/button';
-import { GetPlaceDetails } from '@/service/GlobalApi';
-  import React, { useEffect } from 'react'
-  import { IoIosSend } from "react-icons/io";
+import { Button } from '@/components/ui/button';
+import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
+import React, { useEffect ,useState} from 'react'
+import { IoIosSend } from "react-icons/io";
 
-  function InfoSection({trip}) {
-    useEffect(()=>{
-        trip&&GetPlacePhoto();
-    },[trip])
-    const GetPlacePhoto=async()=>{
-      const data={
-        textQuery:trip?.userSelection?.location?.label
+// const PHOTO_REF_URL='https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=1000&maxWidthPx=1000&key='+import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
+
+function InfoSection({trip}) {
+    
+    const[photoUrl,setPhotoUrl]=useState();
+    const [placeData, setPlaceData] = useState(null);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+      if (trip) {
+          getPlacePhoto();
       }
-      const result=await GetPlaceDetails(data).then(resp=>{
-        console.log(resp.data)
-      }
-    )
-  }
+  }, [trip]);
+
+   const getPlacePhoto = async () => {
+        try {
+            if (!trip?.userSelection?.location?.label) {
+                throw new Error("Location label is missing");
+            }
+
+            const data = {
+                textQuery: trip.userSelection.location.label  
+            };
+
+            const response = await GetPlaceDetails(data);
+            if (response?.data) {
+                setPlaceData(response.data);
+                console.log("Place data:", response.data.places[0].photos[3].name);
+
+                const PhotoUrl=PHOTO_REF_URL.replace('{NAME}',response.data.places[0].photos[3].name);
+                setPhotoUrl(PhotoUrl)
+            }
+        } catch (err) {
+            setError(err.message);
+            console.error("Failed to fetch place details:", err);
+        }
+    };
     return (
       <div>
-          <img src='/globe.jpg' className='h-[340px] w-full object-cover rounded'/>
+          <img src={photoUrl?photoUrl:'/globe.jpg'} className='h-[340px] w-full object-cover rounded'/>
           
           <div className='flex justify-between items-center'>
             <div className='my-5 flex flex-col gap-2'>

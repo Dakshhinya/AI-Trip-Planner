@@ -2,6 +2,7 @@ import React from 'react';
 import PlaceCardItem from './PlaceCardItem';
 
 function PlacesToVisit({ trip }) {
+  console.log(trip);
   return (
     <div className="p-5">
        <h2 className="font-bold text-lg mb-4">Places To Visit</h2>
