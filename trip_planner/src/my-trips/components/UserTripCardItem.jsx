@@ -1,6 +1,7 @@
 import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
 import React from 'react'
 import { useState,useEffect } from 'react';
+import { Link } from 'react-router-dom';
 
 
 function UserTripCardItem({trip}) {
@@ -39,14 +40,16 @@ function UserTripCardItem({trip}) {
     };
 
   return (
-    <div>
+    <Link to={'/view-trip/'+trip?.id}>
+    <div className='hover:scale-105 transition-all py-4'>
         <img src={photoUrl?photoUrl:'/globe.jpg'} 
-        className='object-cover rounded-xl'/>
+        className='rounded-xl h-[220px]  w-full object-cover'/>
         <div>
-            <h2 className='font-bold text-lg'>{trip?.userSelection?.location?.label}</h2>
-        <h2 className='text-sm text-gray-500'>{trip?.userSelection?.noOfDays} Days Trip With {trip.userSelection?.budget} Budget</h2>
+            <h2 className='ml-10 font-bold text-lg'>{trip?.userSelection?.location?.label}</h2>
+        <h2 className='ml-10 text-sm text-gray-500'>{trip?.userSelection?.noOfDays} Days Trip With {trip.userSelection?.budget} Budget</h2>
         </div>
     </div>
+    </Link>
   )
 }
 
