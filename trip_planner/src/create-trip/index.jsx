@@ -40,7 +40,6 @@
         [name]: value,
       }));
     };
-
     useEffect(() => {
       if (isInitialRender) {
         setIsInitialRender(false);
@@ -70,20 +69,27 @@
       onSuccess: (codeResp) => GetUserProfile(codeResp),
       onError: (error) => {
         console.log(error);
-        setOpenDialog(false);
+        setOpenDialog(true);
       }
     });
 
-    const OnGenerateTrip = async () => {
-
-
+    const handleGenerateClick = () => {
+      if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
+        toast("Please fill all details!");
+        return;
+      }
+  
       const user = localStorage.getItem('user');
       if (!user) {
         setOpenDialog(true);
-        return;
+      } else {
+        OnGenerateTrip();
       }
-      if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
-        toast("Please fill all details!");
+    };
+
+    const OnGenerateTrip = async () => {
+      const user = localStorage.getItem('user');
+      if (!user) {
         return;
       }
 
@@ -110,11 +116,21 @@
       }
     };
 
-    const SaveAiTrip=async(TripData)=>{
+  const SaveAiTrip=async(TripData)=>{
 
   setLoading(true);
   const user=JSON.parse(localStorage.getItem('user'));
   const docId=Date.now().toString()
+
+  let tripDataObject;
+  try {
+    tripDataObject = JSON.parse(TripData);
+  } catch (error) {
+    console.error("Invalid JSON format:", error);
+    toast.error("Error: Trip data is not in the correct format.");
+    setLoading(false);
+    return;
+  }
 
   await setDoc(doc(db, "AITrips", docId), {
     userSelection:formData,
@@ -201,7 +217,7 @@
         <div className='flex justify-end my-10'>
           <Button 
           disabled={loading}
-          onClick={() => setOpenDialog(true)}>
+          onClick={handleGenerateClick}>
             {loading?
           <AiOutlineLoading3Quarters className='h-7 w-7 animate-spin' />:'Generate Trip'
 
