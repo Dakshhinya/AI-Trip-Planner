@@ -36,19 +36,47 @@ function HotelCardItem(hotel) {
             console.error("Failed to fetch place details:", err);
         }
     };
-  return (
-    <Link to={'https://www.google.com/maps/search/?api=1&query='+hotel.hotelName+","+hotel?.hotelAddress} target='_blank'>
-          <div className='hover:scale-105 transition-all cursor-pointer'>
-            <img src={photoUrl?photoUrl:'/globe.jpg'} alt='image' className='rounded-xl h-[180px] w-full object-cover'  />
-            <div className='my-2 flex flex-col gap-2'>
-                <h2 className='font-medium'>{hotel?.hotelName}</h2>
-                <h2 className='text-xs text-gray-500'> 📍 {hotel?.hotelAddress}</h2>
-                <h2 className='text-sm'> 💲 {hotel?.price}</h2>
-                <h2 className='text-xs'> ⭐ {hotel?.rating}</h2>
-             </div>
-          </div>
-    </Link>
-  )
-}
+
+
+
+    return (
+        <Link to={'https://www.google.com/maps/search/?api=1&query=' + hotel.hotelName + ',' + hotel?.hotelAddress} target='_blank'>
+            <div className='relative group hover:scale-105 transform transition-all duration-300 cursor-pointer rounded-2xl shadow-lg overflow-hidden bg-white'>
+
+                {/* Hotel Image */}
+                <img 
+                    src={photoUrl ? photoUrl : '/globe.jpg'} 
+                    alt='hotel' 
+                    className='h-[180px] w-full object-cover' 
+                />
+                
+                {/* Hotel Information */}
+                <div className='p-4 space-y-2'>
+                    <h2 className='text-lg font-semibold text-gray-800 truncate'>{hotel?.hotelName}</h2>
+                    <p className='text-sm text-gray-500 flex items-center'>
+                        📍 <span className='ml-1'>{hotel?.hotelAddress}</span>
+                    </p>
+                    <div className='flex justify-between items-center'>
+                        <span className='text-sm font-medium text-green-600'>💲 {hotel?.price}</span>
+                        <span className='text-sm text-yellow-500'>⭐ {hotel?.rating}</span>
+                    </div>
+                </div>
+
+                {/* Hover Popup Overlay */}
+                <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="text-center p-6 text-white space-y-2">
+                        <h2 className="font-bold text-lg">{hotel?.hotelName}</h2>
+                        <p className="text-sm">{hotel?.hotelDescription || 'Enjoy a relaxing stay with top amenities.'}</p>
+                        <p className="text-sm">⭐ Rating: {hotel?.rating}</p>
+                        <p className="text-sm">💲 Price: {hotel?.price}</p>
+                        <p className="text-sm">📍 Address: {hotel?.hotelAddress}</p>
+                    </div>
+                </div>
+
+            </div>
+        </Link>
+    );
+};
+
 
 export default HotelCardItem

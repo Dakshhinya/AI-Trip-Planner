@@ -22,7 +22,7 @@ const Hero = () => {
           <span className="text-[hsl(120,14%,96%)]">Personalized Itineraries at Your Fingertips</span>
         </h1>
   
-        <p className="font-bold text-md sm:text-lg text-[rgb(218,222,220)] text-right mt-2 mb-4 drop-shadow-md animate-fade-in">
+        <p className="font-bold text-md sm:text-lg text-[rgb(133,237,192)] text-right mt-2 mb-4 drop-shadow-md animate-fade-in">
           Your personal trip planner and travel curator, creating custom itineraries tailored to your interests and budget.
         </p>
   

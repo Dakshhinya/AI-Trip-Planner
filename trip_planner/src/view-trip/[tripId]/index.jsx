@@ -30,27 +30,30 @@ useEffect(()=>{
   };
   return (
     <div className='p-10 md:px-20 xl:px-56 bg-gray-50 min-h-screen'>
-      {/* Information Section */}
-      <InfoSection trip={trip} />
-
-      {/* Recommended Hotels */}
-      {trip && Object.keys(trip).length > 0 ? (
-        <div className='mt-10 bg-gray-100 shadow-md rounded-3xl p-6'>
-          <h3 className='text-2xl font-semibold text-gray-800 mb-4'>Recommended Hotels</h3>
-          <Hotels trip={trip} />
+        
+        {/* Curved Edge Container for Information Section */}
+        <div className='bg-gray-100 shadow-md rounded-3xl p-6'>
+            <InfoSection trip={trip} />
         </div>
-      ) : (
-        <p className='text-center text-gray-500 mt-4'>Loading...</p>
-      )}
 
-      {/* Places to Visit */}
-      <div className='mt-10 bg-gray-100 shadow-md rounded-3xl p-6'>
-        <h3 className='text-2xl font-semibold text-gray-800 mb-4'>Places to Visit</h3>
-        <PlacesToVisit trip={trip} />
-      </div>
+        {/* Recommended Hotels */}
+        {trip && Object.keys(trip).length > 0 ? (
+            <div className='mt-10 bg-gray-100 shadow-md rounded-3xl p-6'>
+                <h3 className='text-2xl font-semibold text-gray-800 mb-4'>Recommended Hotels</h3>
+                <Hotels trip={trip} />
+            </div>
+        ) : (
+            <p className='text-center text-gray-500 mt-4'>Loading...</p>
+        )}
 
-      {/* Footer */}
-      {/* <Footer trip={trip} /> */}
+        {/* Places to Visit */}
+        <div className='mt-10 bg-gray-100 shadow-md rounded-3xl p-6'>
+            <h3 className='text-2xl font-semibold text-gray-800 mb-4'>Places to Visit</h3>
+            <PlacesToVisit trip={trip} />
+        </div>
+
+        {/* Footer */}
+        {/* <Footer trip={trip} /> */}
     </div>
 );
 
