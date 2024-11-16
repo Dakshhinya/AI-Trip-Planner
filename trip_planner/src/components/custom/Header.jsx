@@ -32,7 +32,7 @@ const Header = () => {
     }).then((resp) => {
       console.log(resp);
       localStorage.setItem('user', JSON.stringify(resp.data));
-      setOpenDialog(false); // Close the dialog on successful login
+      setOpenDialog(false); 
       window.location.reload();
     }).catch((error) => {
       console.error("Error fetching user profile:", error);
@@ -40,7 +40,14 @@ const Header = () => {
   };
 
   return (
-    <div className='p-3 shadow-lg flex justify-between items-center'>
+    <div 
+      className="p-3 shadow-lg flex justify-between items-center bg-gray-400 bg-opacity-20 backdrop-filter backdrop-blur-lg rounded-lg"
+      style={{
+        boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)",
+        WebkitBackdropFilter: "blur(8px)",
+        borderRadius: "10px"
+      }}
+    >
       <div className='flex items-center space-x-2'>
         <img src='/logo.svg' alt="Logo" />
         <h2 className='text-xl font-semibold'>RoamRight</h2>
@@ -49,10 +56,10 @@ const Header = () => {
         {user ? (
           <div className='flex items-center gap-5'>
             <a href='/create-trip'>
-            <Button variant="outline" className='rounded-full'>+ Create Trip</Button>
+              <Button variant="outline" className='rounded-full'>+ Create Trip</Button>
             </a>
             <a href='/my-trips'>
-            <Button variant="outline" className='rounded-full'>MyTrips</Button>
+              <Button variant="outline" className='rounded-full'>MyTrips</Button>
             </a>
             <Popover>
               <PopoverTrigger>
@@ -93,6 +100,7 @@ const Header = () => {
       </Dialog>
     </div>
   );
+  
 }
 
 export default Header;
