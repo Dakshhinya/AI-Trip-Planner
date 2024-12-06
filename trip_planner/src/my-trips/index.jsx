@@ -1,5 +1,5 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigation } from 'react-router-dom';
 import { db } from '@/service/firebaseConfig';
 import UserTripCardItem from './components/UserTripCardItem';
@@ -9,7 +9,7 @@ function MyTrips() {
     const navigation=useNavigation();
     const [userTrips,setUserTrips]=useState([]);
     const [isLoading, setIsLoading] = useState(true);
-    
+        
     useEffect(()=>{
         GetUserTrips();
     },[])
@@ -59,9 +59,11 @@ return (
             ) : (
                 <div className="col-span-full text-center text-gray-500 py-10">
                     <p className="text-lg">No trips found.</p>
+                    <a href='/create-trip'>
                     <button className="mt-4 px-6 py-2 text-white bg-gradient-to-r from-blue-400 to-blue-600 rounded-lg shadow-md hover:shadow-lg hover:from-blue-500 hover:to-blue-700 transition duration-200">
                         Create Your First Trip
                     </button>
+                    </a>
                 </div>
             )}
         </div>

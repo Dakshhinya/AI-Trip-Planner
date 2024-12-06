@@ -1,4 +1,4 @@
-  import React, { useEffect, useState } from 'react';
+  import  { useEffect, useState } from 'react';
   import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
   import { Input } from '../components/ui/input';
   import { SelectBudgetOptions, SelectTravelsList } from '@/constants/options';
@@ -71,23 +71,35 @@
       onSuccess: (codeResp) => GetUserProfile(codeResp),
       onError: (error) => {
         console.log(error);
-        setOpenDialog(false);
+        setOpenDialog(true);
       }
     });
 
-    const OnGenerateTrip = async () => {
-
-
-      const user = localStorage.getItem('user');
-      if (!user) {
-        setOpenDialog(true);
-        return;
-      }
+    const handleGenerateClick = () => {
       if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
         toast("Please fill all details!");
         return;
       }
 
+      const user = localStorage.getItem('user');
+      if (!user) {
+        setOpenDialog(true);
+      }else {
+        OnGenerateTrip();
+      }
+
+      if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
+        toast("Please fill all details!");
+        return;
+      }
+    };
+
+  const OnGenerateTrip = async () => {
+        const user = localStorage.getItem('user');
+        if (!user) {
+          return;
+        }
+  
       console.log('Generated Trip:', formData);
       setLoading(true);
       const FINAL_PROMPT = AI_PROMPT
@@ -116,7 +128,15 @@
   setLoading(true);
   const user=JSON.parse(localStorage.getItem('user'));
   const docId=Date.now().toString()
-
+  // let tripDataObject;
+  try {
+    // tripDataObject = JSON.parse(TripData);
+  } catch (error) {
+    console.error("Invalid JSON format:", error);
+    toast.error("Error: Trip data is not in the correct format.");
+    setLoading(false);
+    return;
+  }
   await setDoc(doc(db, "AITrips", docId), {
     userSelection:formData,
     tripData:JSON.parse(TripData),
@@ -211,7 +231,7 @@
           <div className="flex justify-end mt-6">
             <Button 
               disabled={loading}
-              onClick={() => setOpenDialog(true)}
+              onClick={handleGenerateClick}
               className="bg-blue-950 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors mb-8"
             >
               {loading ? (
