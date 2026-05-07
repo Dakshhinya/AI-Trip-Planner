@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { toast } from 'sonner';
-import { doc,getDoc } from 'firebase/firestore';
-import { db } from '@/service/firebaseConfig';
+import { getTripById } from '@/service/api';
 import InfoSection from '../components/InfoSection';
 import Hotels from '../components/Hotels';
 import PlacesToVisit from '../components/PlacesToVisit';
@@ -15,17 +14,13 @@ useEffect(()=>{
 },[tripId])
 
   const GetTripData=async()=>{
-    const docRef=doc(db,'AITrips',tripId);
-    const docSnap=await getDoc(docRef);
-
-    if(docSnap.exists()){
-      console.log("Document:",docSnap.data())
-      setTrip(docSnap.data())
-      console.log(trip);
-      // setTrip(4);
-    }else{
-      console.log("No Such Document")
-      toast('No Trip Found!')
+    try {
+      const data = await getTripById(tripId);
+      console.log("Document:", data);
+      setTrip(data);
+    } catch (error) {
+      console.log("Error fetching trip:", error);
+      toast('No Trip Found!');
     }
   };
   return (

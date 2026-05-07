@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Button } from '../ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { GoogleLogin, googleLogout, useGoogleLogin } from '@react-oauth/google';
-import { useNavigation } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader } from "@/components/ui/dialog";
 import { BsGoogle } from "react-icons/bs";
 import axios from 'axios';
 
 const Header = () => {
   const user = JSON.parse(localStorage.getItem('user'));
+
   const [openDialog, setOpenDialog] = useState(false);
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const Header = () => {
         {user ? (
           <div className='flex items-center gap-5'>
             <a href='/create-trip'>
-              <Button variant="outline" className='rounded-full'>+ Create Trip</Button>
+              <Button variant="outline" className='rounded-full'>Create Trip</Button>
             </a>
             <a href='/my-trips'>
               <Button variant="outline" className='rounded-full'>MyTrips</Button>

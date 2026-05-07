@@ -1,156 +1,164 @@
-  import  { useEffect, useState } from 'react';
-  import GooglePlacesAutocomplete from 'react-google-places-autocomplete';
-  import { Input } from '../components/ui/input';
-  import { SelectBudgetOptions, SelectTravelsList } from '@/constants/options';
-  import { Button } from '@/components/ui/button';
-  import { toast } from 'sonner';
-  import { AI_PROMPT } from '@/constants/options';
-  import { chatSession } from '@/service/AIModal';
-  import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader
-  } from "@/components/ui/dialog";
-  import { BsGoogle } from "react-icons/bs";
-  import { useGoogleLogin } from '@react-oauth/google';
-  import axios from 'axios';
-  import { AiOutlineLoading3Quarters } from "react-icons/ai";
-  import { setDoc,doc } from 'firebase/firestore';
-  import { db } from '@/service/firebaseConfig';
-  import { useNavigate } from 'react-router-dom';
-  
-  const CreateTrip = () => {
-  const [place, setPlace] = useState();
+import { useEffect, useState } from 'react';
+import LocationInput from '@/components/custom/LocationInput';
+import { Input } from '../components/ui/input';
+import { SelectBudgetOptions, SelectTravelsList } from '@/constants/options';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { generateTrip } from '@/service/AIModal';
+import {Dialog,DialogContent,DialogDescription,DialogHeader} from "@/components/ui/dialog";
+import { BsGoogle } from "react-icons/bs";
+import { useGoogleLogin } from '@react-oauth/google';
+import axios from 'axios';
+import { AiOutlineLoading3Quarters } from "react-icons/ai";
+import { saveTrip } from '@/service/api';
+import { useNavigate } from 'react-router-dom';
 
-    const [formData, setFormData] = useState({
-      location: '',
-      noOfDays: '',
-      budget: '',
-      traveller: '',
-    });
+const CreateTrip = () => {
+  const [formData, setFormData] = useState({
+    location: '',
+    noOfDays: '',
+    budget: '',
+    traveller: '',
+  });
 
-    const [isInitialRender, setIsInitialRender] = useState(true);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [loading,setLoading]=useState(false);
-    
-    const navigate=useNavigate();
-    const handleInputChange = (name, value) => {
-      setFormData(prevData => ({
-        ...prevData,
-        [name]: value,
-      }));
-    };
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-      if (isInitialRender) {
-        setIsInitialRender(false);
-        return;
-      }
-      console.log(formData);
-    }, [formData]);
+  const navigate = useNavigate();
+// };
+  const handleInputChange = (name, value) => {
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-    const GetUserProfile = (tokenInfo) => {
-      axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`, {
-        headers: {
-          Authorization: `Bearer ${tokenInfo?.access_token}`,
-          Accept: `Application/json`
-        }
-      }).then((resp) => {
-        console.log(resp);
-        localStorage.setItem('user',JSON.stringify(resp.data));
+  const GetUserProfile = (tokenInfo) => {
+    axios.get(`https://www.googleapis.com/oauth2/v1/userinfo?access_token=${tokenInfo?.access_token}`)
+      .then((resp) => {
+        localStorage.setItem('user', JSON.stringify(resp.data));
         setOpenDialog(false);
         OnGenerateTrip();
-        
-      }).catch((error) => {
-        console.error("Error fetching user profile:", error);
-      });
-    };
+      })
+      .catch(() => toast.error("Login failed"));
+  };
 
-    const login = useGoogleLogin({
-      onSuccess: (codeResp) => GetUserProfile(codeResp),
-      onError: (error) => {
-        console.log(error);
-        setOpenDialog(true);
-      }
-    });
+  const login = useGoogleLogin({
+    onSuccess: GetUserProfile,
+    onError: () => setOpenDialog(true)
+  });
 
-    const handleGenerateClick = () => {
-      if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
-        toast("Please fill all details!");
-        return;
-      }
+  const handleGenerateClick = () => {
+    const { location, noOfDays, budget, traveller } = formData;
 
-      const user = localStorage.getItem('user');
-      if (!user) {
-        setOpenDialog(true);
-      }else {
-        OnGenerateTrip();
-      }
+   if (
+  !formData.location?.label ||
+  !formData.noOfDays ||
+  !formData.budget ||
+  !formData.traveller
+) {
+  toast("Please fill all details!");
+  return;
+}
 
-      if (!formData.noOfDays || !formData.location || !formData.budget || !formData.traveller) {
-        toast("Please fill all details!");
-        return;
-      }
-    };
+    const user = localStorage.getItem('user');
+    if (!user) setOpenDialog(true);
+    else OnGenerateTrip();
+  };
+
 
   const OnGenerateTrip = async () => {
-        const user = localStorage.getItem('user');
-        if (!user) {
-          return;
-        }
-  
-      console.log('Generated Trip:', formData);
-      setLoading(true);
-      const FINAL_PROMPT = AI_PROMPT
-        .replace('{location}', formData?.location.label)
-        .replace('{totalDays}', formData?.noOfDays)
-        .replace('{traveller}', formData?.traveller)
-        .replace('{budget}', formData?.budget);
+    const user = localStorage.getItem('user');
+    if (!user) return;
 
+    setLoading(true);
 
-      try {
-        const result = await chatSession.sendMessage(FINAL_PROMPT);
-        const responseText = result?.response
-          ? await result.response.text()
-          : await result.text();
-    
-        console.log(responseText);
-        setLoading(false);
-        SaveAiTrip(responseText)
-      } catch (error) {
-        console.error("Error sending message:", error);
-      }
-    };
+  const FINAL_PROMPT = `
+You are a JSON generator ONLY.
 
-    const SaveAiTrip=async(TripData)=>{
+STRICT RULES:
+- Output ONLY valid JSON
+- No markdown, no backticks
+- All strings must be single line
+- Escape quotes properly
+- No comments
+- No trailing commas
 
-  setLoading(true);
-  const user=JSON.parse(localStorage.getItem('user'));
-  const docId=Date.now().toString()
-  // let tripDataObject;
-  try {
-    // tripDataObject = JSON.parse(TripData);
-  } catch (error) {
-    console.error("Invalid JSON format:", error);
-    toast.error("Error: Trip data is not in the correct format.");
-    setLoading(false);
-    return;
-  }
-  await setDoc(doc(db, "AITrips", docId), {
-    userSelection:formData,
-    tripData:JSON.parse(TripData),
-    userEmail:user?.email,
-    id:docId
-  });
-  setLoading(false);
-  navigate('/view-trip/'+docId)
+Return EXACT schema:
+
+{
+  "hotelOptions": [
+    {
+      "hotelName": "string",
+      "hotelAddress": "string",
+      "price": "string",
+      "rating": "string",
+      "hotelImageUrl": "string (must be real image URL from Unsplash)"
     }
-    useEffect(() => {
-      console.log("Dialog open state:", openDialog);
-    }, [openDialog]);
+  ],
+  "itinerary": [
+    {
+      "day": number,
+      "plan": [
+        {
+          "placeName": "string",
+          "placeDetails": "string",
+          "placeImageUrl": "string (Unsplash URL only)",
+          "time": "string"
+        }
+      ]
+    }
+  ]
+}
+`;
+try {
+  const responseText = await generateTrip(FINAL_PROMPT);
+  console.log("RAW AI RESPONSE:", responseText);
+  SaveAiTrip(responseText);
+} catch (error) {
+  toast.error("AI Generation Failed");
+  setLoading(false);
+}
+};
 
-    return (
+  const SaveAiTrip = async (TripData) => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    const docId = Date.now().toString();
+
+    let parsedData;
+
+   const cleanJson = (text) => {
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return JSON.parse(match[0]);
+  } catch (err) {
+    console.error("JSON parsing failed", err);
+    return null;
+  }
+};
+
+parsedData = cleanJson(TripData);
+
+if (!parsedData) {
+  toast.error("AI returned invalid JSON");
+  return;
+}
+
+    try {
+      await saveTrip({
+        userSelection: formData,
+        tripData: parsedData,
+        userEmail: user?.email,
+        id: docId
+      });
+
+      navigate(`/view-trip/${docId}`);
+
+    } catch (err) {
+      toast.error("Save failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
       <div className="relative min-h-screen flex justify-center items-center px-5">
         {/* Full-page Background Image */}
         <div className="absolute inset-0 bg-cover bg-center  w-full" style={{ backgroundImage: `url('bg2.jpg')`, filter: 'blur(8px) brightness(0.7)' }}></div>
@@ -166,12 +174,9 @@
             {/* Destination Input */}
             <div>
               <h2 className="text-lg font-semibold text-blue-950 mb-1">Destination</h2>
-              <GooglePlacesAutocomplete
-                apiKey={import.meta.env.VITE_GOOGLE_PLACE_API_KEY}
-                selectProps={{
-                  place,
-                  onChange: (v) => { setPlace(v); handleInputChange('location', v); }
-                }}
+              <LocationInput
+                // onSelect={(v) => { setPlace(v); handleInputChange('location', v); }}
+                onSelect={(v) => handleInputChange('location', v)}
               />
             </div>
     
@@ -268,7 +273,6 @@
         </div> {/* End of glass container */}
       </div>
     );
-    
-  };
+};
 
-  export default CreateTrip;
+export default CreateTrip;

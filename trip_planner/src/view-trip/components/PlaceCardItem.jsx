@@ -2,50 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { FaMapLocation } from "react-icons/fa6";
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
 function PlaceCardItem({place}){
 
-    const[photoUrl,setPhotoUrl]=useState();
-    const [placeData, setPlaceData] = useState(null);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-      if (place) {
-          getPlacePhoto();
-      }
-  }, [place]);
-
-   const getPlacePhoto = async () => {
-        try {
-            if (!place.placeName) {
-                throw new Error("Location label is missing");
-            }
-
-            const data = {
-                textQuery: place.placeName
-            };
-
-            const response = await GetPlaceDetails(data);
-            if (response?.data) {
-                setPlaceData(response.data);
-                const PhotoUrl=PHOTO_REF_URL.replace('{NAME}',response.data.places[0].photos[3].name);
-                setPhotoUrl(PhotoUrl)
-            }
-        } catch (err) {
-            setError(err.message);
-            console.error("Failed to fetch place details:", err);
-        }
-    };
+    // Removed Google Place Details fetching
 
     return (
-        <Link to={'https://www.google.com/maps/search/?api=1&query=' + place.placeName} target='_blank'>
+        <Link to={'https://www.openstreetmap.org/search?query=' + place.placeName} target='_blank'>
             <div className='relative group border rounded-2xl p-4 mt-2 flex gap-5 hover:scale-105 transition-transform hover:shadow-lg cursor-pointer bg-white overflow-hidden'>
                 
                 {/* Image Section */}
                 <img 
-                    src={photoUrl ? photoUrl : '/globe.jpg'} 
+                    src={place?.placeImageUrl || '/globe.jpg'} 
+                    onError={(e) => (e.target.src = '/globe.jpg')}
                     className='h-[130px] w-[130px] rounded-xl object-cover' 
-                    alt='place'
+                    alt={place.placeName}
                 />
     
                 {/* Content Section */}

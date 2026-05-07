@@ -1,8 +1,8 @@
   
 import { Button } from '@/components/ui/button';
-import { GetPlaceDetails, PHOTO_REF_URL } from '@/service/GlobalApi';
 import React, { useEffect ,useState} from 'react'
 import { IoIosSend } from "react-icons/io";
+import MapComponent from '@/components/custom/MapComponent';
 
 // const PHOTO_REF_URL='https://places.googleapis.com/v1/{NAME}/media?maxHeightPx=1000&maxWidthPx=1000&key='+import.meta.env.VITE_GOOGLE_PLACE_API_KEY;
 
@@ -12,43 +12,21 @@ function InfoSection({trip}) {
     const [placeData, setPlaceData] = useState(null);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-      if (trip) {
-          getPlacePhoto();
-      }
-  }, [trip]);
+    const lat = trip?.userSelection?.location?.value?.lat;
+    const lon = trip?.userSelection?.location?.value?.lon;
 
-   const getPlacePhoto = async () => {
-        try {
-            if (!trip?.userSelection?.location?.label) {
-                throw new Error("Location label is missing");
-            }
-
-            const data = {
-                textQuery: trip.userSelection.location.label  
-            };
-
-            const response = await GetPlaceDetails(data);
-            if (response?.data) {
-                setPlaceData(response.data);
-                console.log("Place data:", response.data.places[0].photos[3].name);
-
-                const PhotoUrl=PHOTO_REF_URL.replace('{NAME}',response.data.places[0].photos[3].name);
-                setPhotoUrl(PhotoUrl)
-            }
-        } catch (err) {
-            setError(err.message);
-            console.error("Failed to fetch place details:", err);
-        }
-    };
     return (
         <div className='relative group'>
-            {/* Image Section */}
-            <img 
-                src={photoUrl ? photoUrl : '/globe.jpg'} 
-                className='h-[340px] w-full object-cover rounded'
-                alt='trip'
-            />
+            {/* Map/Image Section */}
+            {lat && lon ? (
+                <MapComponent lat={lat} lng={lon} label={trip?.userSelection?.location?.label} />
+            ) : (
+                <img 
+                    src='/globe.jpg' 
+                    className='h-[340px] w-full object-cover rounded'
+                    alt='trip'
+                />
+            )}
             
             {/* Content Section */}
             <div className='flex justify-between items-center mt-5 px-4'>
