@@ -13,7 +13,6 @@ function PlacesToVisit({ trip }) {
     );
   }
   const getValidImage = (url) => {
-  // ❌ invalid or fake URLs
   if (!url || url.includes("example.com")) {
     return "https://images.unsplash.com/photo-1507525428034-b723cf961d3e";
   }
@@ -23,10 +22,7 @@ function PlacesToVisit({ trip }) {
 
   return (
     <div className="p-5">
-      <h2 className="font-bold text-lg mb-4">Places To Visit</h2>
-
       {itinerary.map((item, dayIndex) => {
-        // ✅ Handle both "plan" and "activities"
         const places = item?.plan || item?.activities || [];
 
         return (
@@ -39,19 +35,15 @@ function PlacesToVisit({ trip }) {
               {Array.isArray(places) && places.length > 0 ? (
                 places.map((place, placeIndex) => (
                   <div key={placeIndex}>
-                    {/* ✅ Safe time display */}
                     <h2 className="font-medium text-sm text-orange-600 mb-1">
                       {place?.time || "Flexible Time"}
                     </h2>
 
-                    {/* ✅ Pass normalized data */}
                     <PlaceCardItem
                       place={{
                         placeName: place?.placeName || place?.name || "Unknown Place",
                         placeDetails: place?.placeDetails || place?.description || "No details available",
-                        // placeImageUrl: place?.placeImageUrl || "",
-                            placeImageUrl: getValidImage(place?.placeImageUrl), // ✅ FIXED
-
+                        placeImageUrl: getValidImage(place?.placeImageUrl),
                         geoCoordinates: place?.geoCoordinates || "",
                         ticketPricing: place?.ticketPricing || "N/A",
                         rating: place?.rating || "N/A"

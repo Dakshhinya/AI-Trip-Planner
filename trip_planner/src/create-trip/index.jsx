@@ -102,6 +102,8 @@ Return EXACT schema:
           "placeDetails": "string",
           "placeImageUrl": "string (Unsplash URL only)",
           "time": "string"
+          "rating":"string"
+          "price":"string"
         }
       ]
     }
@@ -150,6 +152,7 @@ if (!parsedData) {
       });
 
       navigate(`/view-trip/${docId}`);
+      toast('Trip Created Successfully!')
 
     } catch (err) {
       toast.error("Save failed");
@@ -160,10 +163,8 @@ if (!parsedData) {
 
   return (
       <div className="relative min-h-screen flex justify-center items-center px-5">
-        {/* Full-page Background Image */}
         <div className="absolute inset-0 bg-cover bg-center  w-full" style={{ backgroundImage: `url('bg2.jpg')`, filter: 'blur(8px) brightness(0.7)' }}></div>
     
-        {/* Glass Container */}
         <div className="relative bg-white/30 backdrop-blur-lg p-6 shadow-lg rounded-lg border border-white/20 z-10  max-w-[900px] h-[700px] mx-5 flex flex-col justify-between">
         <h2 className="font-bold text-3xl text-blue-950 text-center mt-3">Travel Preferences</h2>
           <p className="mt-1 text-gray-700 text-lg text-center">
@@ -171,16 +172,13 @@ if (!parsedData) {
           </p>
     
           <div className="mt-6 flex flex-col gap-6">
-            {/* Destination Input */}
             <div>
               <h2 className="text-lg font-semibold text-blue-950 mb-1">Destination</h2>
               <LocationInput
-                // onSelect={(v) => { setPlace(v); handleInputChange('location', v); }}
                 onSelect={(v) => handleInputChange('location', v)}
               />
             </div>
     
-            {/* Duration Input */}
             <div>
               <h2 className="text-lg font-semibold text-blue-950 mb-1">Preferred Duration (Days)</h2>
               <Input
@@ -195,7 +193,6 @@ if (!parsedData) {
               />
             </div>
     
-            {/* Budget Options */}
             <div>
               <h2 className="text-lg font-semibold text-blue-950 mb-1">Select Budget</h2>
               <div className="grid grid-cols-3 gap-4">
@@ -213,7 +210,6 @@ if (!parsedData) {
               </div>
             </div>
     
-            {/* Travel Companions */}
             <div>
               <h2 className="text-lg font-semibold text-blue-950 mb-1">Travel Companions</h2>
               <div className="grid grid-cols-3 gap-4">
@@ -232,13 +228,11 @@ if (!parsedData) {
             </div>
           </div>
     
-          {/* Generate Trip Button */}
           <div className="flex justify-end mt-6">
             <Button 
               disabled={loading}
               onClick={handleGenerateClick}
-              className="bg-blue-950 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors mb-8"
-            >
+              className="bg-blue-950 text-white px-6 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors mb-8">
               {loading ? (
                 <AiOutlineLoading3Quarters className="h-6 w-6 animate-spin" />
               ) : (
@@ -247,7 +241,6 @@ if (!parsedData) {
             </Button>
           </div>
     
-          {/* Sign In Dialog */}
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogContent>
               <DialogHeader>
@@ -270,7 +263,7 @@ if (!parsedData) {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-        </div> {/* End of glass container */}
+        </div> 
       </div>
     );
 };

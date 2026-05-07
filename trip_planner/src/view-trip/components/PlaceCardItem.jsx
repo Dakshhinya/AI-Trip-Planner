@@ -1,16 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { FaMapLocation } from "react-icons/fa6";
-import { Button } from '@/components/ui/button';
+import React from 'react'
 import { Link } from 'react-router-dom';
 function PlaceCardItem({place}){
 
-    // Removed Google Place Details fetching
 
     return (
         <Link to={'https://www.openstreetmap.org/search?query=' + place.placeName} target='_blank'>
             <div className='relative group border rounded-2xl p-4 mt-2 flex gap-5 hover:scale-105 transition-transform hover:shadow-lg cursor-pointer bg-white overflow-hidden'>
-                
-                {/* Image Section */}
                 <img 
                     src={place?.placeImageUrl || '/globe.jpg'} 
                     onError={(e) => (e.target.src = '/globe.jpg')}
@@ -18,7 +13,6 @@ function PlaceCardItem({place}){
                     alt={place.placeName}
                 />
     
-                {/* Content Section */}
                 <div className='flex flex-col justify-between'>
                     <div>
                         <h2 className='font-semibold text-lg text-gray-800'>{place.placeName}</h2>
@@ -30,7 +24,6 @@ function PlaceCardItem({place}){
                     </div>
                 </div>
 
-                {/* Hover Popup Overlay */}
                 <div className="absolute inset-0 bg-black bg-opacity-75 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                     <div className="text-center p-4 text-white">
                         <h2 className="font-bold text-lg">{place.placeName}</h2>

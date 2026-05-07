@@ -1,13 +1,9 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import HotelCardItem from './HotelCardItem';
+
 function Hotels({ trip }) {
     console.log("Hotel options data:", trip?.tripData?.hotelOptions);
 
-    
-    const getHotelImage = (name) => {
-  return `https://source.unsplash.com/random/400x300/?hotel,${encodeURIComponent(name)}`;
-};
     // console.log("IMAGE URL:", getHotelImage(hotel?.hotelName));
   return (
     <div>
@@ -15,14 +11,13 @@ function Hotels({ trip }) {
       <div className='grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-5'>
         {Array.isArray(trip?.tripData?.hotelOptions) ? trip.tripData.hotelOptions.map((hotel, index) => (
            <HotelCardItem 
-  key={index}
-  hotelName={hotel?.hotelName}
-  hotelAddress={hotel?.hotelAddress}
-  price={hotel?.price}
-  rating={hotel?.rating}
-  hotelImageUrl={hotel?.hotelImageUrl}
-/>
-        )) : <p className="text-red-500">Error: hotel options format is malformed.</p>
+            key={index}
+            hotelName={hotel?.hotelName}
+            hotelAddress={hotel?.hotelAddress}
+            price={hotel?.price}
+            rating={hotel?.rating}
+            hotelImageUrl={hotel?.hotelImageUrl}  
+            />)) : <p className="text-red-500">Error: hotel options format is malformed.</p>
         }
       </div>
     </div>

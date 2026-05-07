@@ -12,6 +12,7 @@ function MyTrips() {
     useEffect(()=>{
         GetUserTrips();
     },[])
+
     const GetUserTrips=async()=>{
         try{
         const user=JSON.parse(localStorage.getItem('user'));
@@ -64,5 +65,4 @@ return (
 );
 
 }
-//hello
 export default MyTrips
