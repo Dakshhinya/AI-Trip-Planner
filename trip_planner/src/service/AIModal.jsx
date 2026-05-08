@@ -32,7 +32,6 @@ export async function generateTrip(prompt) {
   } catch (error) {
     console.log("Gemini failed:", error.message);
 
-    // 🔁 Retry once
     await new Promise(res => setTimeout(res, 2000));
 
     const retry = await model.generateContent(prompt);

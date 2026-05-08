@@ -25,7 +25,7 @@ const CreateTrip = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
-// };
+
   const handleInputChange = (name, value) => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };

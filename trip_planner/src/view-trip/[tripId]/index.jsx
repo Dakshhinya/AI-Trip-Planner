@@ -8,10 +8,13 @@ import PlacesToVisit from '../components/PlacesToVisit';
 
 function Viewtrip() {
   const {tripId}=useParams()
+  console.log(tripId)
+
   const[trip,setTrip]=useState({})
-useEffect(()=>{
-    tripId&&GetTripData()
-},[tripId])
+
+  useEffect(()=>{
+      tripId&&GetTripData()
+  },[tripId])
 
   const GetTripData=async()=>{
     try {
