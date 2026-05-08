@@ -1,4 +1,5 @@
 const Trip = require('../models/tripModel');
+const { redisClient } = require('../config/redis');
 
 exports.createTrip = async (req, res) => {
     console.log("Incoming saveTrip request!");
@@ -19,7 +20,7 @@ exports.createTrip = async (req, res) => {
         });
 
         console.log("Saving trip to database...");
-        await newTrip.save();
+        await newTrip.save(); //save to Mongo
         console.log("Trip saved successfully!");
         res.status(201).json({ message: 'Trip saved successfully', trip: newTrip });
     } catch (error) {
@@ -32,7 +33,21 @@ exports.getTripsByUser = async (req, res) => {
     const { email } = req.params;
 
     try {
+        const cacheKey = `userTrips:${email}`;
+        const cachedTrips = await redisClient.get(cacheKey);
+        if (cachedTrips) {
+            console.log('Serving from Redis Cache');
+            return res.status(200).json(JSON.parse(cachedTrips));
+        }
         const trips = await Trip.find({ userEmail: email }).sort({ createdAt: -1 });
+        await redisClient.set(
+            cacheKey,
+            JSON.stringify(trips),
+            {
+                EX: 3600
+            }
+        );
+        console.log('Serving from MongoDB');
         res.status(200).json(trips);
     } catch (error) {
         console.error('Error fetching trips:', error);

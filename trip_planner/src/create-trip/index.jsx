@@ -72,6 +72,16 @@ const CreateTrip = () => {
 
   const FINAL_PROMPT = `
 You are a JSON generator ONLY.
+Generate a travel plan for ${formData.noOfDays} days to ${formData.location.label}.
+
+Requirements:
+- Generate EXACTLY ${formData.noOfDays} itinerary days
+- Generate EXACTLY ${formData.noOfDays} hotel recommendations
+- Each day must contain minimum 2 places
+- Return ONLY valid JSON
+- Do not include markdown
+- Do not skip any day
+
 
 STRICT RULES:
 - Output ONLY valid JSON
@@ -101,8 +111,8 @@ Return EXACT schema:
           "placeName": "string",
           "placeDetails": "string",
           "placeImageUrl": "string (Unsplash URL only)",
-          "time": "string"
-          "rating":"string"
+          "time": "string",
+          "rating":"string",
           "price":"string"
         }
       ]
@@ -148,9 +158,14 @@ if (!parsedData) {
         userSelection: formData,
         tripData: parsedData,
         userEmail: user?.email,
-        id: docId
-      });
+        id: docId,
 
+        tripImage:
+          parsedData?.itinerary?.[0]?.plan?.[0]?.placeImageUrl ||
+          parsedData?.hotelOptions?.[0]?.hotelImageUrl ||
+          '/globe.jpg'
+      });
+      console.log("TRIP SAVED");
       navigate(`/view-trip/${docId}`);
       toast('Trip Created Successfully!')
 
